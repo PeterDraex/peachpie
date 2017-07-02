@@ -815,7 +815,13 @@ namespace Pchp.Core
 
             var iterator = (Iterator)traversable;
 
+            // PHP invokes iterator in following order:
+
+            // rewind()
+            // valid(), current(), key(), next()
+
             iterator.rewind();
+
             while (iterator.valid())
             {
                 Debug.Assert((byrefs & (1ul << stack.Count)) == 0, "Cannot pass by-reference when unpacking a Traversable");
@@ -824,6 +830,12 @@ namespace Pchp.Core
                 //}
 
                 stack.Add(iterator.current());
+
+                if (PhpVariable.AsString(iterator.key()) != null)
+                {
+                    // TODO: Fatal error: Cannot unpack Traversable with string keys
+                }
+
                 iterator.next();
             }
         }
